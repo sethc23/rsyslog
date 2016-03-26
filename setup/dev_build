@@ -1,0 +1,106 @@
+#!/bin/bash -l
+
+shopt -s expand_aliases
+source ~/.bashrc
+
+# https://launchpad.net/~adiscon/+archive/ubuntu/v8-stable/+packages
+# https://launchpad.net/~adiscon/+archive/ubuntu/v8-devel/+packages
+
+install_upgrade_packages() {
+    sudo apt-add-repository ppa:adiscon/v8-devel
+    ap_update
+
+    for i in \
+        bison \
+        flex \
+        libjson0-dev \
+        uuid-dev \
+        libgcrypt11-dev \
+        liblognorm-dev \
+        liblogging-stdlog-dev \
+        libfastjson-dev \
+        libnet1-dev \
+        librabbitmq-dev \
+        libhiredis-dev
+    do
+        ap_upgrade $i || ap_install $i
+    done
+}
+
+working_configuration(){
+    ./configure \
+    --enable-debug \
+    --enable-libgcrypt \
+    --enable-gnutls \
+    --enable-elasticsearch \
+    --enable-elasticsearch-tests \
+    --enable-pgsql \
+    --enable-mail \
+    --enable-imfile \
+    --enable-imptcp \
+    --enable-impstats \
+    --enable-mmnormalize \
+    --enable-mmjsonparse \
+    --enable-omprog \
+    --enable-omudpspoof \
+    --enable-omstdout \
+    --enable-omruleset \
+    --enable-omuxsock \
+    --enable-mmsnmptrapd \
+    --enable-omrabbitmq \
+    --enable-omhiredis > ../setup/rsys_config
+
+}
+
+test_configuration(){
+    ./configure \
+    --enable-debug \
+    --enable-libgcrypt \
+    --enable-gnutls \
+    --enable-elasticsearch \
+    --enable-elasticsearch-tests \
+    --enable-pgsql \
+    --enable-mail \
+    --enable-imfile \
+    --enable-imptcp \
+    --enable-impstats \
+    --enable-mmnormalize \
+    --enable-mmjsonparse \
+    --enable-omprog \
+    --enable-omudpspoof \
+    --enable-omstdout \
+    --enable-omjournal \
+    --enable-omruleset \
+    --enable-omuxsock \
+    --enable-mmsnmptrapd \
+    --enable-omrabbitmq \
+    --enable-omhiredis \
+    --enable-omhttpfs > ../setup/rsys_config
+    
+}
+
+### Update Packages
+# install_upgrade_packages
+
+
+### Configure
+cd ../rsyslog
+sudo make clean
+
+autoreconf -fvi
+
+working_configuration
+# test_configuration
+
+echo "exiting"
+exit 99
+echo "still?"
+
+make || c_f_pink && c_bold && echo "Issue with `make`" && c_reset exit 1
+sudo make install || c_f_pink && c_bold && echo "Issue with `make install`" && c_reset exit 1
+
+sudo rsyslogd -d -f /etc/rsyslog.conf -N 0
+c_f_yellow && c_bold && echo "Above is test with current config." && c_reset exit 1
+
+sudo rsyslog -v
+c_f_yellow && c_bold && echo "COMPLETE" && c_reset exit 1

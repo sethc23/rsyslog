@@ -1,7 +1,8 @@
 checking for a BSD-compatible install... /usr/bin/install -c
 checking whether build environment is sane... yes
 checking for a thread-safe mkdir -p... /bin/mkdir -p
-checking for gawk... gawk
+checking for gawk... no
+checking for mawk... mawk
 checking whether make sets $(MAKE)... yes
 checking whether make supports nested variables... yes
 checking whether make supports nested variables... (cached) yes
@@ -45,13 +46,13 @@ checking whether gcc accepts -g... (cached) yes
 checking for gcc option to accept ISO C89... (cached) none needed
 checking whether gcc understands -c and -o together... (cached) yes
 checking dependency style of gcc... (cached) gcc3
-checking for gcc option to accept ISO C99... -std=gnu99
+checking for gcc option to accept ISO C99... none needed
 checking build system type... x86_64-unknown-linux-gnu
 checking host system type... x86_64-unknown-linux-gnu
 checking how to print strings... printf
 checking for a sed that does not truncate output... /bin/sed
 checking for fgrep... /bin/grep -F
-checking for ld used by gcc -std=gnu99... /usr/bin/ld
+checking for ld used by gcc... /usr/bin/ld
 checking if the linker (/usr/bin/ld) is GNU ld... yes
 checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
 checking the name lister (/usr/bin/nm -B) interface... BSD nm
@@ -70,19 +71,19 @@ checking for ar... ar
 checking for archiver @FILE support... @
 checking for strip... strip
 checking for ranlib... ranlib
-checking command to parse /usr/bin/nm -B output from gcc -std=gnu99 object... ok
+checking command to parse /usr/bin/nm -B output from gcc object... ok
 checking for sysroot... no
 checking for mt... mt
 checking if mt is a manifest tool... no
 checking for dlfcn.h... yes
 checking for objdir... .libs
-checking if gcc -std=gnu99 supports -fno-rtti -fno-exceptions... no
-checking for gcc -std=gnu99 option to produce PIC... -fPIC -DPIC
-checking if gcc -std=gnu99 PIC flag -fPIC -DPIC works... yes
-checking if gcc -std=gnu99 static flag -static works... yes
-checking if gcc -std=gnu99 supports -c -o file.o... yes
-checking if gcc -std=gnu99 supports -c -o file.o... (cached) yes
-checking whether the gcc -std=gnu99 linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
 checking whether -lc should be explicitly linked in... no
 checking dynamic linker characteristics... GNU/Linux ld.so
 checking how to hardcode library paths into programs... immediate
@@ -93,7 +94,6 @@ checking whether to build static libraries... no
 checking for pkg-config... /usr/bin/pkg-config
 checking pkg-config is at least version 0.9.0... yes
 checking for LIBESTR... yes
-checking for JSON_C... no
 checking for JSON_C... yes
 checking for json_object_new_object in -ljson-c... yes
 checking for json_object_new_int64... yes
@@ -190,11 +190,7 @@ checking for fork... yes
 checking for vfork... yes
 checking for working fork... yes
 checking for working vfork... (cached) yes
-checking whether gcc -std=gnu99 needs -traditional... no
-checking for stdlib.h... (cached) yes
-checking for GNU libc compatible malloc... yes
-checking for stdlib.h... (cached) yes
-checking for GNU libc compatible realloc... yes
+checking whether gcc needs -traditional... no
 checking sys/select.h usability... yes
 checking sys/select.h presence... yes
 checking for sys/select.h... yes
@@ -268,6 +264,8 @@ checking pthread.h usability... yes
 checking pthread.h presence... yes
 checking for pthread.h... yes
 checking for pthread_create in -lpthread... yes
+checking for pthread_rwlockattr_setkind_np in -lpthread... yes
+checking for pthread_setname_np in -lpthread... yes
 checking for pthread_setschedparam... yes
 checking sched.h usability... yes
 checking sched.h presence... yes
@@ -299,9 +297,6 @@ checking for hdfs.h... no
 checking hadoop/hdfs.h usability... no
 checking hadoop/hdfs.h presence... no
 checking for hadoop/hdfs.h... no
-checking librdkafka/rdkafka.h usability... yes
-checking librdkafka/rdkafka.h presence... yes
-checking for librdkafka/rdkafka.h... yes
 checking for RABBITMQ... yes
 checking for HIREDIS... yes
 configure: checking if required man pages already exist...
@@ -358,10 +353,12 @@ config.status: creating plugins/omelasticsearch/Makefile
 config.status: creating plugins/mmsnmptrapd/Makefile
 config.status: creating plugins/pmlastmsg/Makefile
 config.status: creating contrib/pmsnare/Makefile
+config.status: creating contrib/pmpanngfw/Makefile
 config.status: creating contrib/pmaixforwardedfrom/Makefile
 config.status: creating contrib/omhiredis/Makefile
 config.status: creating contrib/omrabbitmq/Makefile
 config.status: creating contrib/imkmsg/Makefile
+config.status: creating contrib/mmgrok/Makefile
 config.status: creating contrib/mmcount/Makefile
 config.status: creating contrib/omzmq3/Makefile
 config.status: creating contrib/omczmq/Makefile
@@ -371,8 +368,10 @@ config.status: creating contrib/mmsequence/Makefile
 config.status: creating contrib/mmrfc5424addhmac/Makefile
 config.status: creating contrib/pmcisconames/Makefile
 config.status: creating contrib/omhttpfs/Makefile
+config.status: creating contrib/omamqp1/Makefile
 config.status: creating tests/Makefile
 config.status: creating config.h
+config.status: config.h is unchanged
 config.status: executing depfiles commands
 config.status: executing libtool commands
 ****************************************************
@@ -421,6 +420,7 @@ rsyslog will be compiled with the following settings:
     omczmq module will be compiled:           no
     omrabbitmq module will be compiled:       yes
     omhttpfs module will be compiled:         no
+    omamqp1 module will be compiled:          no
 
 ---{ parser modules }---
     pmlastmsg module will be compiled:        no
@@ -428,10 +428,12 @@ rsyslog will be compiled with the following settings:
     pmciscoios module will be compiled:       no
     pmaixforwardedfrom module w.be compiled:  no
     pmsnare module will be compiled:          no
+    pmpanngfw module will be compiled:        no
 
 ---{ message modification modules }---
     mmnormalize module will be compiled:      yes
     mmjsonparse module will be compiled:      yes
+    mmgrok module will be compiled:           no
     mmjaduit module will be compiled:         no
     mmsnmptrapd module will be compiled:      yes
     mmutf8fix enabled:                        no
