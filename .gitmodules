@@ -1,3 +1,6 @@
 [submodule "rsyslog"]
 	path = rsyslog
 	url = https://github.com/rsyslog/rsyslog.git
+[submodule "setup/local_libs/libfastjson"]
+	path = setup/local_libs/libfastjson
+	url = git@github.com:rsyslog/libfastjson.git
