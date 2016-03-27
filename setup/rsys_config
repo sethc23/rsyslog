@@ -47,8 +47,8 @@ checking for gcc option to accept ISO C89... (cached) none needed
 checking whether gcc understands -c and -o together... (cached) yes
 checking dependency style of gcc... (cached) gcc3
 checking for gcc option to accept ISO C99... none needed
-checking build system type... x86_64-unknown-linux-gnu
-checking host system type... x86_64-unknown-linux-gnu
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
 checking how to print strings... printf
 checking for a sed that does not truncate output... /bin/sed
 checking for fgrep... /bin/grep -F
@@ -58,10 +58,8 @@ checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
 checking the name lister (/usr/bin/nm -B) interface... BSD nm
 checking whether ln -s works... yes
 checking the maximum length of command line arguments... 1572864
-checking whether the shell understands some XSI constructs... yes
-checking whether the shell understands "+="... yes
-checking how to convert x86_64-unknown-linux-gnu file names to x86_64-unknown-linux-gnu format... func_convert_file_noop
-checking how to convert x86_64-unknown-linux-gnu file names to toolchain format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
 checking for /usr/bin/ld option to reload object files... -r
 checking for objdump... objdump
 checking how to recognize dependent libraries... pass_all
@@ -73,6 +71,8 @@ checking for strip... strip
 checking for ranlib... ranlib
 checking command to parse /usr/bin/nm -B output from gcc object... ok
 checking for sysroot... no
+checking for a working dd... /bin/dd
+checking how to truncate binary pipes... /bin/dd bs=4096 count=1
 checking for mt... mt
 checking if mt is a manifest tool... no
 checking for dlfcn.h... yes
@@ -279,7 +279,7 @@ checking for CURL... yes
 checking for cos in -lm... yes
 checking for GNUTLS... yes
 checking for gnutls_certificate_set_retrieve_function... yes
-checking for gnutls_certificate_type_set_priority... yes
+checking for gnutls_certificate_type_set_priority... no
 checking for libgcrypt-config... /usr/bin/libgcrypt-config
 checking for gcry_cipher_open in -lgcrypt... yes
 checking for LIBLOGNORM... yes
@@ -291,6 +291,7 @@ checking libnet.h usability... yes
 checking libnet.h presence... yes
 checking for libnet.h... yes
 checking for libnet_init in -lnet... yes
+checking for LIBSYSTEMD_JOURNAL... yes
 checking hdfs.h usability... no
 checking hdfs.h presence... no
 checking for hdfs.h... no
@@ -410,7 +411,7 @@ rsyslog will be compiled with the following settings:
     omkafka module will be compiled:          no
     omprog module will be compiled:           yes
     omstdout module will be compiled:         yes
-    omjournal module will be compiled:        no
+    omjournal module will be compiled:        yes
     omhdfs module will be compiled:           no
     omelasticsearch module will be compiled:  yes
     omruleset module will be compiled:        yes

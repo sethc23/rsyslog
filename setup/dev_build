@@ -6,6 +6,17 @@ source ~/.bashrc
 # https://launchpad.net/~adiscon/+archive/ubuntu/v8-stable/+packages
 # https://launchpad.net/~adiscon/+archive/ubuntu/v8-devel/+packages
 
+LOCAL_LIBS=local_libs
+
+libfastjson(){
+    cd $LOCAL_LIBS/libfastjson
+    sh ./autogen.sh
+    ./configure
+    make
+    sudo make install
+}
+
+
 install_upgrade_packages() {
     sudo apt-add-repository ppa:adiscon/v8-devel
     ap_update
@@ -21,7 +32,9 @@ install_upgrade_packages() {
         libfastjson-dev \
         libnet1-dev \
         librabbitmq-dev \
-        libhiredis-dev
+        libhiredis-dev \
+        libgnutls-dev \
+        libsystemd-dev
     do
         ap_upgrade $i || ap_install $i
     done
@@ -44,6 +57,7 @@ working_configuration(){
     --enable-omprog \
     --enable-omudpspoof \
     --enable-omstdout \
+    --enable-omjournal \
     --enable-omruleset \
     --enable-omuxsock \
     --enable-mmsnmptrapd \
@@ -54,27 +68,27 @@ working_configuration(){
 
 test_configuration(){
     ./configure \
-    --enable-debug \
-    --enable-libgcrypt \
-    --enable-gnutls \
-    --enable-elasticsearch \
-    --enable-elasticsearch-tests \
-    --enable-pgsql \
-    --enable-mail \
-    --enable-imfile \
-    --enable-imptcp \
-    --enable-impstats \
-    --enable-mmnormalize \
-    --enable-mmjsonparse \
-    --enable-omprog \
-    --enable-omudpspoof \
-    --enable-omstdout \
-    --enable-omjournal \
-    --enable-omruleset \
-    --enable-omuxsock \
-    --enable-mmsnmptrapd \
-    --enable-omrabbitmq \
-    --enable-omhiredis \
+    # --enable-debug \
+    # --enable-libgcrypt \
+    # --enable-gnutls \
+    # --enable-elasticsearch \
+    # --enable-elasticsearch-tests \
+    # --enable-pgsql \
+    # --enable-mail \
+    # --enable-imfile \
+    # --enable-imptcp \
+    # --enable-impstats \
+    # --enable-mmnormalize \
+    # --enable-mmjsonparse \
+    # --enable-omprog \
+    # --enable-omudpspoof \
+    # --enable-omstdout \
+    # --enable-omjournal \
+    # --enable-omruleset \
+    # --enable-omuxsock \
+    # --enable-mmsnmptrapd \
+    # --enable-omrabbitmq \
+    # --enable-omhiredis \
     --enable-omhttpfs > ../setup/rsys_config
     
 }
@@ -86,15 +100,10 @@ test_configuration(){
 ### Configure
 cd ../rsyslog
 sudo make clean
-
 autoreconf -fvi
-
 working_configuration
 # test_configuration
 
-echo "exiting"
-exit 99
-echo "still?"
 
 make || c_f_pink && c_bold && echo "Issue with `make`" && c_reset exit 1
 sudo make install || c_f_pink && c_bold && echo "Issue with `make install`" && c_reset exit 1
@@ -102,5 +111,5 @@ sudo make install || c_f_pink && c_bold && echo "Issue with `make install`" && c
 sudo rsyslogd -d -f /etc/rsyslog.conf -N 0
 c_f_yellow && c_bold && echo "Above is test with current config." && c_reset exit 1
 
-sudo rsyslog -v
+sudo rsyslogd -v
 c_f_yellow && c_bold && echo "COMPLETE" && c_reset exit 1

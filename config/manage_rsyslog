@@ -1,0 +1,62 @@
+#!/bin/zsh
+
+
+debug_enable(){
+    sudo systemctl stop rsyslog.service syslog.socket
+    sudo cp -r $SH/rsyslog/config/debug.conf /etc/rsyslog.d/debug.conf
+    sudo rm -fr /tmp/debug.sock
+    touch /tmp/debug.sock
+    sudo systemctl start rsyslog.service syslog.socket.service
+}
+[[ "$1" = "enable" ]] && enable
+
+debug_disable(){
+    sudo systemctl stop rsyslog.service syslog.socket
+    sudo unlink /etc/rsyslog.d/debug.conf
+    sudo rm -fr /tmp/debug.sock
+    sudo systemctl start rsyslog.service syslog.socket
+}
+[[ "$1" = "disable" ]] && disable
+
+update_production(){
+    sudo systemctl stop rsyslog.service
+    sudo rm -fr /run/systemd/journal/socket
+    sudo rm -fr /etc/rsyslog.d/* && sudo rm /etc/rsyslog.conf
+    sudo cp $SH/rsyslog/config/rsyslog.conf /etc/
+    sudo cp $SH/rsyslog/config/production/* /etc/rsyslog.d/
+    sudo chmod -R 644 /etc/rsyslog.conf
+    sudo chown -R root:root /etc/rsyslog.conf
+    sudo chmod -R 644 /etc/rsyslog.d/*
+    sudo chown -R root:root /etc/rsyslog.d/*
+    sudo systemctl start rsyslog.service
+    sudo systemctl start syslog.socket
+    sudo systemctl start rsyslog.service
+}
+[[ "$1" = "update_production" ]] && update_production
+
+
+log_iptables(){
+    # NOTES:
+    #
+    #   ping-to-external -> output -> postrouting -> input
+    #
+    #
+    sudo iptables -F
+    sudo iptables -A INPUT -i lo -j ACCEPT
+    sudo iptables -A INPUT -m limit --limit 6/min -j LOG --log-prefix "IP-INPUT: " --log-level 4
+    sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    sudo iptables -A INPUT -p tcp --sport 80 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --sport 443 -j ACCEPT
+    sudo iptables -A FORWARD -m limit --limit 6/min -j LOG --log-prefix "IP-FORWARD: " --log-level 4
+    sudo iptables -A OUTPUT -o lo -j ACCEPT
+    sudo iptables -A OUTPUT -m limit --limit 6/min -j LOG --log-prefix "IP-OUTPUT: " --log-level 4
+    sudo iptables -A OUTPUT -j ACCEPT
+    sudo iptables -t nat -A PREROUTING -m limit --limit 6/min -j LOG --log-prefix "IP-NAT-PREROUTING: " --log-level 4
+    sudo iptables -t nat -A INPUT -m limit --limit 6/min -j LOG --log-prefix "IP-NAT-INPUT: " --log-level 4
+    sudo iptables -t nat -A OUTPUT -m limit --limit 6/min -j LOG --log-prefix "IP-NAT-OUTPUT: " --log-level 4
+    sudo iptables -t nat -A POSTROUTING -m limit --limit 6/min -j LOG --log-prefix "IP-NAT-POSTROUTING: " --log-level 4
+
+    dmesg -w
+}
+[[ "$1" = "log_iptables" ]] && log_iptables
+
