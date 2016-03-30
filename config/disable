@@ -13,7 +13,5 @@ sudo systemctl disable syslog.socket
 
 sudo systemctl enable rsyslog.service
 sudo systemctl start rsyslog.service
-
-
-sudo systemctl enable syslog.socket
+#sudo systemctl enable syslog.socket
 sudo systemctl start syslog.socket

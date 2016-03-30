@@ -2,6 +2,13 @@
 
 cd ../rsyslog
 
+
+# Initial Libraries to install
+# sudo add-apt-repository ppa:adiscon/v8-stable 
+# sudo apt-get update
+# libestr-dev liblognorm-dev
+
+
 # Update
 git pull
 
