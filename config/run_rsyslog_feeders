@@ -1,0 +1,42 @@
+#!/bin/bash
+
+USER=ub1
+
+HOME=/home/$USER
+source $HOME/.bashrc
+
+LOG_FILE=/var/log/syslogs/supervisor.log
+sudo rm -f /var/sockets/supervisor.sock
+
+trap 'sudo kill -TERM $NGX_SOCAT_PID; \
+sudo kill -TERM $SYS_SOCAT_PID' TERM INT
+
+
+while [ ! -S /var/sockets/supervisor.sock ]
+    do
+        sleep 1
+    done
+
+
+sudo /usr/local/bin/socat -d -lf /var/log/syslogs/socat.log -lp syslog_feeder -u \
+exec:"/usr/bin/tail -n 30 -f /var/log/syslogs/supervisor.log",nonblock=1,ignoreeof,shut-null \
+unix:/var/sockets/supervisor.sock,crnl,ignoreeof,null-eof &
+SYS_SOCAT_PID=$!
+
+MSG_PREFIX="supervisor "`date +'%Y-%m-%d %H:%M:%S%z'`" INFO:"
+sudo sh -c "echo \"$MSG_PREFIX success: rsyslog_feeder\" >> /var/log/syslogs/supervisor.log"
+
+
+sudo tail -n 0 -f /var/log/syslogs/resty_logger.log | while read line; \
+do echo $line | socat -lf /var/log/syslogs/socat.log -lp resty_feeder \
+- unix:/var/sockets/web_socket_relay.sock; done &
+NGX_SOCAT_PID=$!
+
+MSG_PREFIX="supervisor "`date +'%Y-%m-%d %H:%M:%S%z'`" INFO:"
+sudo sh -c "echo \"$MSG_PREFIX success: resty_feeder\" >> /var/log/syslogs/supervisor.log"
+
+
+EXIT_STATUS=$?
+
+sudo sh -c "echo \"$MSG_PREFIX stopped: resty_feeder\" >> /var/log/syslogs/supervisor.log"
+sudo sh -c "echo \"$MSG_PREFIX stopped: rsyslog_feeder\" >> /var/log/syslogs/supervisor.log"

@@ -10,6 +10,8 @@ LOCAL_LIBS=local_libs
 
 libfastjson(){
     cd $LOCAL_LIBS/libfastjson
+    git submodule init
+    git submodule update
     sh ./autogen.sh
     ./configure
     make
@@ -38,6 +40,8 @@ install_upgrade_packages() {
     do
         ap_upgrade $i || ap_install $i
     done
+
+    libfastjson
 }
 
 working_configuration(){
@@ -94,7 +98,7 @@ test_configuration(){
 }
 
 ### Update Packages
-# install_upgrade_packages
+install_upgrade_packages
 
 
 ### Configure
